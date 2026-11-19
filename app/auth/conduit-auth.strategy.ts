@@ -1,5 +1,5 @@
 import { APIRequestContext } from '@playwright/test';
-import { Credentials, TokenAuthStrategy } from '../../src/modules/auth';
+import { Credentials, TokenAuthStrategy } from '@qa-kit/core';
 import { AuthApi } from '../api/auth.api';
 
 /**

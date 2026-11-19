@@ -1,0 +1,56 @@
+{
+  "name": "@qa-kit/core",
+  "version": "0.4.0",
+  "description": "Modular, beginner-friendly Playwright + TypeScript building blocks for end-to-end feature checks (API + UI)",
+  "keywords": [
+    "playwright",
+    "typescript",
+    "test-automation",
+    "e2e",
+    "api-testing",
+    "qa",
+    "page-object",
+    "fixtures"
+  ],
+  "author": "Anna Moskaleva",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/annetMos/qa-kit.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/annetMos/qa-kit#readme",
+  "bugs": "https://github.com/annetMos/qa-kit/issues",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "qa-kit": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.51.0"
+  }
+}

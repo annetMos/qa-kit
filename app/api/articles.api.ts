@@ -1,5 +1,5 @@
 import { APIRequestContext } from '@playwright/test';
-import { BaseApiClient } from '../../src/modules/api';
+import { BaseApiClient } from '@qa-kit/core';
 
 /** Data needed to create an article. Build it with `ArticleBuilder`. */
 export type NewArticle = {

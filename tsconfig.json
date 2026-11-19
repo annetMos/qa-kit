@@ -7,7 +7,13 @@
     "noImplicitOverride": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "app", "tests", "scripts", "playwright.config.ts"]
+  "include": [
+    "app",
+    "tests",
+    "playwright.config.ts"
+  ]
 }

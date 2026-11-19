@@ -7,7 +7,7 @@ export { unique } from './unique';
 export const testDataManifest: ModuleManifest = {
   name: 'test-data',
   description: 'Test data builders with valid defaults and unique values safe for parallel runs',
-  fixtures: ['none — import Builder and unique from src/modules/test-data'],
+  fixtures: ["none — import { Builder, unique } from '@qa-kit/core'"],
   example: `const article = new ArticleBuilder().withTitle(unique.title('Promo')).build();`,
 };
 

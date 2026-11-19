@@ -1,7 +1,6 @@
 {
-  "name": "qa-kit",
-  "version": "0.3.0",
-  "description": "Modular, beginner-friendly Playwright + TypeScript test automation starter for end-to-end feature checks (API + UI)",
+  "name": "qa-kit-example",
+  "version": "0.4.0",
   "keywords": [
     "playwright",
     "typescript",
@@ -19,19 +18,27 @@
     "node": ">=20"
   },
   "scripts": {
+    "build": "npm run build -w @qa-kit/core",
+    "pretest": "npm run build",
     "test": "playwright test",
-    "test:ui": "playwright test --ui",
+    "test:ui": "npm run build && playwright test --ui",
     "report": "playwright show-report",
     "demo": "node demo-app/server.mjs",
+    "pretypecheck": "npm run build",
     "typecheck": "tsc --noEmit",
-    "features": "tsx scripts/features.ts",
+    "prefeatures": "npm run build",
+    "features": "node packages/core/dist/cli.js features",
     "check": "npm run typecheck && npm test"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.6",
     "dotenv": "^18.0.10",
-    "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
-  }
+    "typescript": "^7.0.2",
+    "@qa-kit/core": "*"
+  },
+  "description": "Example project and development workspace for @qa-kit/core",
+  "workspaces": [
+    "packages/*"
+  ]
 }

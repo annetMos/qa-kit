@@ -22,7 +22,7 @@ export type AuthTestOptions = {
    *
    * With a role, the browser starts already logged in and `authorizedApi` uses the same
    * session — there is no UI login in the test. Each role logs in once per worker.
-   * Roles are defined by the `users` fixture in `app/fixtures.ts`.
+   * Roles are defined by the `users` fixture in your fixtures file (e.g. `app/fixtures.ts`).
    *
    * @example
    * ```ts
@@ -55,7 +55,7 @@ export type AuthTestFixtures = {
 
 export type AuthWorkerFixtures = {
   /**
-   * How to log in to your application. Override it in `app/fixtures.ts` with a
+   * How to log in to your application. Override it in your fixtures file (e.g. `app/fixtures.ts`) with a
    * `TokenAuthStrategy` subclass (token in localStorage) or a `CookieAuthStrategy`
    * subclass (session cookie).
    */
@@ -63,7 +63,7 @@ export type AuthWorkerFixtures = {
   /**
    * Test users by role; the first role is the default one.
    * Default: a single `user` role from `USER_EMAIL` / `USER_PASSWORD`.
-   * Override it in `app/fixtures.ts` to add roles.
+   * Override it in your fixtures file (e.g. `app/fixtures.ts`) to add roles.
    */
   users: UsersByRole;
   /** Session cache by role within a worker. Rarely needed in tests directly. */
@@ -76,7 +76,7 @@ export const test = base.extend<AuthTestOptions & AuthTestFixtures, AuthWorkerFi
   authStrategy: [
     async ({}, _use) => {
       throw new Error(
-        '[auth] No login strategy configured. Override the authStrategy fixture in app/fixtures.ts ' +
+        '[auth] No login strategy configured. Override the authStrategy fixture in your fixtures file (e.g. app/fixtures.ts) ' +
           '(for example, with a TokenAuthStrategy subclass).',
       );
     },

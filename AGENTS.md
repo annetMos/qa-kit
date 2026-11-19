@@ -3,9 +3,9 @@
 This project is qa-kit, a Playwright + TypeScript test automation framework. Tests check a feature end to end: API + UI.
 
 ## Architecture
-- `src/core` — core (config, module interface). Contains no project-specific logic.
-- `src/modules/<name>` — pluggable modules. Each exports `test` with fixtures and a `manifest`.
-- `src/fixtures.ts` — module composition via `mergeTests`.
+- `packages/core` — the `@qa-kit/core` npm package (framework). Contains no project-specific logic.
+  - `src/modules/<name>` — modules; each exports `test` with fixtures and a `manifest`.
+  - `src/index.ts` — public API. Project code imports **only** from `'@qa-kit/core'`, never from package internals.
 - `app/` — code for the application under test: API clients (`app/api`), Page Objects (`app/pages`), data builders (`app/data`), login strategy (`app/auth`), project fixtures (`app/fixtures.ts`).
 - `tests/` — scenarios only. Tests import `test`/`expect` from `app/fixtures`.
 - `demo-app/` — built-in application for examples and CI. Without `.env`, tests run against it.

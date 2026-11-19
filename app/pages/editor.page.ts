@@ -1,5 +1,5 @@
 import { Locator, Page } from '@playwright/test';
-import { BasePage } from '../../src/modules/ui';
+import { BasePage } from '@qa-kit/core';
 import { NewArticle } from '../api/articles.api';
 
 /**

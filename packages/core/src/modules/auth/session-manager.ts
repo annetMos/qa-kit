@@ -33,7 +33,7 @@ export class SessionManager {
   get defaultRole(): string {
     const [first] = this.roles;
     if (!first) {
-      throw new Error('[auth] The users list is empty. Define the users fixture in app/fixtures.ts.');
+      throw new Error('[auth] The users list is empty. Define the users fixture in your fixtures file (e.g. app/fixtures.ts).');
     }
     return first;
   }
@@ -48,7 +48,7 @@ export class SessionManager {
     if (!credentials) {
       throw new Error(
         `[auth] Unknown role "${role}". Available roles: ${this.roles.join(', ') || 'none'}. ` +
-          `Roles are defined by the users fixture in app/fixtures.ts.`,
+          `Roles are defined by the users fixture in your fixtures file (e.g. app/fixtures.ts).`,
       );
     }
 

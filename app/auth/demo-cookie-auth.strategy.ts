@@ -1,5 +1,5 @@
 import { APIRequestContext } from '@playwright/test';
-import { CookieAuthStrategy, Credentials } from '../../src/modules/auth';
+import { CookieAuthStrategy, Credentials } from '@qa-kit/core';
 import { AuthApi } from '../api/auth.api';
 
 /**

@@ -35,7 +35,7 @@ export type Session = {
  * Describes **how** to log in to your application via the API.
  *
  * Usually you don't implement this interface directly — extend `TokenAuthStrategy`
- * (token in localStorage) or `CookieAuthStrategy` (session cookie). Plug the strategy in via the `authStrategy` fixture in `app/fixtures.ts`.
+ * (token in localStorage) or `CookieAuthStrategy` (session cookie). Plug the strategy in via the `authStrategy` fixture in your fixtures file (e.g. `app/fixtures.ts`).
  *
  * @see {@link https://github.com/annetMos/qa-kit#authentication-auth-module | README: Authentication}
  */

@@ -8,8 +8,10 @@ git clone https://github.com/annetMos/qa-kit.git
 cd qa-kit
 npm install
 npx playwright install chromium
-npm run check   # typecheck + tests against the demo-app
+npm run check   # builds @qa-kit/core, then typecheck + tests against the demo-app
 ```
+
+The repo is an npm workspace: the framework lives in `packages/core` (published as `@qa-kit/core`), and the root is an example project that consumes it exactly like users do. Root scripts rebuild the package before tests, so changes in `packages/core/src` are picked up automatically.
 
 ## Workflow
 1. For larger changes, open an issue first so we can agree on the approach.
@@ -52,7 +54,13 @@ Tips:
 - Locators get a one-line comment: which element it is and when it is visible.
 
 ## Adding a module
-1. Create `src/modules/<name>/` with an `index.ts` that exports `test` (fixtures) and `<name>Manifest`.
-2. Plug `test` into `src/fixtures.ts` via `mergeTests`.
-3. Add the manifest to `src/modules/registry.ts`.
-4. Add a usage example in `tests/` and a section in `README.md`.
+1. Create `packages/core/src/modules/<name>/` with an `index.ts` that exports `test` (fixtures) and `<name>Manifest`.
+2. Plug `test` into `packages/core/src/fixtures.ts` via `mergeTests`.
+3. Add the manifest to `packages/core/src/registry.ts`.
+4. Export the public API from `packages/core/src/index.ts` (the module's `test` as `<name>Test`).
+5. Add a usage example in `tests/` and a section in `README.md`.
+
+## Releasing
+1. Bump `version` in `packages/core/package.json` and the root `package.json`, update `CHANGELOG.md`.
+2. Commit, then push a tag: `git tag -a v0.5.0 -m "v0.5.0" && git push origin v0.5.0`.
+3. The `Release` workflow builds and publishes `@qa-kit/core` to npm (needs the `NPM_TOKEN` repository secret).

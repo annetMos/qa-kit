@@ -1,9 +1,29 @@
 # qa-kit
 
-A modular **Playwright + TypeScript** test automation starter for checking a feature end to end: **API + UI**.
-Built for people moving from manual testing into automation: capabilities are discoverable through IDE autocompletion and `npm run features`, and unused modules can be switched off with one line.
+[![npm](https://img.shields.io/npm/v/@qa-kit/core)](https://www.npmjs.com/package/@qa-kit/core)
 
-## Quick start
+Modular **Playwright + TypeScript** building blocks for checking a feature end to end: **API + UI**.
+Built for people moving from manual testing into automation: every method has hover hints with examples, and `npx qa-kit features` shows what the framework can do.
+
+qa-kit comes in two parts:
+- **`@qa-kit/core`** — an npm package with the framework. Install it into your project and get updates with `npm update`.
+- **This repository** — a complete, runnable example project that uses the package, plus the beginner guide.
+
+## Add qa-kit to your project
+
+```bash
+npm i -D @qa-kit/core @playwright/test
+npx playwright install chromium
+npx qa-kit features      # see modules, fixtures and examples
+```
+
+Requires Node.js 20+ and `@playwright/test` 1.51+. Then:
+1. Create `app/fixtures.ts`: extend `test` from `@qa-kit/core` with your login strategy and API clients — copy [app/fixtures.ts](app/fixtures.ts) from this repo as a starting point.
+2. Add API clients (`BaseApiClient`), Page Objects (`BasePage`) and builders (`Builder`) under `app/` — see the examples in [app/](app/).
+3. Write tests in `tests/`, importing `test` and `expect` from your `app/fixtures`.
+4. Set `BASE_URL`, `API_URL`, `USER_EMAIL`, `USER_PASSWORD` in `.env` (see [.env.example](.env.example)).
+
+## Try the example project
 
 Requires Node.js 20+.
 
@@ -28,15 +48,9 @@ Without a `.env` file, tests run against the built-in **demo-app** (a mini RealW
 | `npm test` | Run all tests |
 | `npm run test:ui` | Playwright UI mode: tests, steps, time-travel debugging |
 | `npm run report` | Open the HTML report of the last run |
-| `npm run features` | Show enabled modules and usage examples |
+| `npm run features` | Show modules and usage examples |
 | `npm run demo` | Start the demo-app manually: http://localhost:4555 |
 | `npm run typecheck` | Type-check the project |
-
-## Using it with your application
-1. `cp .env.example .env` and set your environment URLs and test user.
-2. Describe API clients in `app/api` (subclasses of `BaseApiClient`) and pages in `app/pages` (subclasses of `BasePage`).
-3. Plug in your login strategy and clients in `app/fixtures.ts`.
-4. Write scenarios in `tests/`, importing `test` and `expect` from `app/fixtures`.
 
 ## Test example
 ```ts
@@ -85,22 +99,33 @@ const many = new ArticleBuilder().buildMany(5); // 5 articles, 5 unique titles
 
 Need a builder for your own entity? Extend `Builder<T>` and implement `defaults()`; use `unique.id()`, `unique.email()` and `unique.title()` for values that must not repeat.
 
-## Project structure
+## Repository structure
 ```
-src/core/          core: environment config, module interface
-src/modules/ui/    BasePage — base for Page Objects
-src/modules/api/   BaseApiClient, api and cleanup fixtures
-src/modules/auth/  role-based login: TokenAuthStrategy, CookieAuthStrategy, SessionManager
-src/modules/test-data/  Builder base class and unique value helpers
-src/fixtures.ts    module composition via mergeTests
-app/               application-specific code (clients, pages, fixtures)
-tests/             scenarios
+packages/core/     @qa-kit/core — the npm package
+  src/core/          environment config, module interface
+  src/modules/ui/    BasePage — base for Page Objects
+  src/modules/api/   BaseApiClient, api and cleanup fixtures
+  src/modules/auth/  role-based login: TokenAuthStrategy, CookieAuthStrategy, SessionManager
+  src/modules/test-data/  Builder base class and unique value helpers
+  src/index.ts       public API
+app/               example project code (clients, pages, builders, fixtures) — uses @qa-kit/core
+tests/             example scenarios
 demo-app/          built-in application for examples and CI
+docs/              guides
 AGENTS.md          guidelines for AI agents
 ```
 
 ## Modules
-Enable or disable modules in `src/fixtures.ts` (`mergeTests(...)`) and `src/modules/registry.ts`.
+`test` from `@qa-kit/core` includes all modules. To use only some of them, compose your own `test`:
+
+```ts
+import { mergeTests } from '@playwright/test';
+import { apiTest, testDataTest, uiTest } from '@qa-kit/core';
+
+export const test = mergeTests(uiTest, apiTest, testDataTest); // no auth module
+```
+
+If your code uses fixtures of a module you removed (e.g. `authorizedApi`), TypeScript points to every place to update.
 
 | Module | Status | What it provides |
 |---|---|---|

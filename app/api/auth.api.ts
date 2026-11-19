@@ -1,5 +1,5 @@
 import { APIRequestContext } from '@playwright/test';
-import { BaseApiClient } from '../../src/modules/api';
+import { BaseApiClient } from '@qa-kit/core';
 
 type LoginResponse = { user: { email: string; username: string; token: string } };
 

@@ -1,4 +1,4 @@
-import { Builder, unique } from '../../src/modules/test-data';
+import { Builder, unique } from '@qa-kit/core';
 import { NewArticle } from '../api/articles.api';
 
 /**

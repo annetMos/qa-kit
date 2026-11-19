@@ -1,5 +1,5 @@
-import { EnvConfig } from '../src/core/config';
-import { test as base } from '../src/fixtures';
+import { EnvConfig } from '@qa-kit/core';
+import { test as base } from '@qa-kit/core';
 import { ArticlesApi } from './api/articles.api';
 import { ConduitAuthStrategy } from './auth/conduit-auth.strategy';
 
@@ -44,4 +44,4 @@ export const test = base.extend<AppFixtures>({
   },
 });
 
-export { expect } from '../src/fixtures';
+export { expect } from '@qa-kit/core';
