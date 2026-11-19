@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write # npm Trusted Publishing (OIDC) and provenance — no npm token is stored
+  id-token: write # npm Trusted Publishing (OIDC) — no npm token is stored
 
 jobs:
   publish:
@@ -21,7 +21,7 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
 
-      # Trusted Publishing needs npm 11.5.1+, Node 22 ships npm 10
+      # Staged publishing needs npm 11.15.0+, Node 22 ships npm 10
       - name: Update npm
         run: npm install -g npm@latest
 
@@ -46,6 +46,10 @@ jobs:
             echo "published=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Publish @qa-kit/core
+      # The release is staged, not published: a maintainer approves it on npmjs.com
+      # (Staged Packages tab) or with `npm stage approve <id>` — both require 2FA.
+      # `npm stage` is unaware of workspaces, so it runs inside the package folder.
+      - name: Stage @qa-kit/core for approval
         if: steps.version.outputs.published != 'true'
-        run: npm publish -w @qa-kit/core --access public --provenance
+        working-directory: packages/core
+        run: npm stage publish --access public
