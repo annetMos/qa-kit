@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The framework is now an npm package: **`@qa-kit/core`**. Install it with `npm i -D @qa-kit/core @playwright/test` and get updates with `npm update`.
 - `npx qa-kit features` CLI command.
 - Module-level exports (`uiTest`, `apiTest`, `authTest`, `testDataTest`) to compose only the modules you need.
-- `Release` workflow that publishes the package to npm on a version tag.
+- `Release` workflow that publishes the package to npm on a version tag via Trusted Publishing (OIDC), without a stored npm token.
 
 ### Changed
 - Repository is an npm workspace: framework in `packages/core`, the root is an example project that consumes the package.

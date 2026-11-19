@@ -63,4 +63,6 @@ Tips:
 ## Releasing
 1. Bump `version` in `packages/core/package.json` and the root `package.json`, update `CHANGELOG.md`.
 2. Commit, then push a tag: `git tag -a v0.5.0 -m "v0.5.0" && git push origin v0.5.0`.
-3. The `Release` workflow builds and publishes `@qa-kit/core` to npm (needs the `NPM_TOKEN` repository secret).
+3. The `Release` workflow runs the checks and publishes `@qa-kit/core` to npm via
+   [Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC) — no npm token is stored in the repo.
+   If the version is already on npm, the publish step is skipped.

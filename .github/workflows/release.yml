@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write # npm provenance
+  id-token: write # npm Trusted Publishing (OIDC) and provenance — no npm token is stored
 
 jobs:
   publish:
@@ -21,6 +21,10 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
 
+      # Trusted Publishing needs npm 11.5.1+, Node 22 ships npm 10
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: npm ci
 
@@ -30,14 +34,18 @@ jobs:
           npm run check
 
       - name: Check tag matches package version
+        id: version
         run: |
-          PKG_VERSION="v$(node -p "require('./packages/core/package.json').version")"
-          if [ "$PKG_VERSION" != "$GITHUB_REF_NAME" ]; then
-            echo "Tag $GITHUB_REF_NAME does not match package version $PKG_VERSION"
+          VERSION="$(node -p "require('./packages/core/package.json').version")"
+          if [ "v$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package version v$VERSION"
             exit 1
+          fi
+          if npm view "@qa-kit/core@$VERSION" version >/dev/null 2>&1; then
+            echo "@qa-kit/core@$VERSION is already on npm — skipping publish"
+            echo "published=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Publish @qa-kit/core
+        if: steps.version.outputs.published != 'true'
         run: npm publish -w @qa-kit/core --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
