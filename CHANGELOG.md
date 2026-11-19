@@ -3,6 +3,9 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- Beginner guide: `docs/first-test.md` — from a manual test case to an automated test.
+- `.vscode/extensions.json` recommending the official Playwright Test for VSCode extension.
 
 ## [0.2.0] — 2026-11-19
 ### Added

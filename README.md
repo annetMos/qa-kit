@@ -17,6 +17,10 @@ npm test
 
 Without a `.env` file, tests run against the built-in **demo-app** (a mini RealWorld/Conduit clone) — Playwright starts it automatically.
 
+**New to test automation?** Start with [Your first test in 15 minutes](docs/first-test.md).
+
+**Using VS Code?** Open the project and accept the recommended *Playwright Test for VSCode* extension: run and debug tests with the ▶ button, pick locators by clicking on the page.
+
 | Command | What it does |
 |---|---|
 | `npm test` | Run all tests |
