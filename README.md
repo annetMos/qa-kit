@@ -43,11 +43,31 @@ test('статья, созданная через API, отображается 
 });
 ```
 
+## Авторизация (модуль `auth`)
+Тест без роли — гость. Чтобы браузер и API стартовали уже залогиненными, достаточно указать роль:
+
+```ts
+test.describe('Пользователь', () => {
+  test.use({ role: 'user' });
+
+  test('видит своё имя в шапке', async ({ page }) => {
+    await page.goto('/');
+    await expect(new HeaderComponent(page).currentUser).toHaveText('qa');
+  });
+});
+```
+
+- Вход выполняется **через API один раз на роль в каждом worker**, сессия переиспользуется — UI-логина в тестах нет.
+- `authorizedApi` — API-контекст с токеном текущей роли.
+- Роли задаются фикстурой `users` в `app/fixtures.ts` (по умолчанию одна роль `user` из `USER_EMAIL` / `USER_PASSWORD`).
+- Как входить в ваше приложение, описывает стратегия в `app/auth/`. Если фронтенд хранит токен в localStorage — наследуйтесь от `TokenAuthStrategy` и укажите ключ и способ получения токена (см. `ConduitAuthStrategy`).
+
 ## Структура
 ```
 src/core/          ядро: конфиг окружения, интерфейс модуля
 src/modules/ui/    BasePage — основа для Page Object
 src/modules/api/   BaseApiClient, фикстуры api и cleanup
+src/modules/auth/  вход по ролям: TokenAuthStrategy, SessionManager
 src/fixtures.ts    сборка модулей через mergeTests
 app/               код под конкретное приложение (клиенты, страницы, фикстуры)
 tests/             сценарии
@@ -62,7 +82,7 @@ AGENTS.md          правила для AI-агентов
 |---|---|---|
 | `ui` | ✅ | `BasePage` для Page Object |
 | `api` | ✅ | `BaseApiClient`, `api`, `cleanup` |
-| `auth` | 🗓 план | вход через API и передача сессии в браузер |
+| `auth` | ✅ | вход через API один раз на роль, браузер и API уже авторизованы |
 | `test-data` | 🗓 план | генерация тестовых данных |
 | `reporting` | 🗓 план | Allure |
 

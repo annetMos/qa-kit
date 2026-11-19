@@ -25,10 +25,53 @@ const sendJson = (res, status, body) => {
   res.end(JSON.stringify(body));
 };
 
+/**
+ * Клиентский скрипт: как во фронтенде Conduit, токен лежит в localStorage (jwtToken).
+ * Шапка показывает текущего пользователя, редактор работает только с токеном.
+ */
+const CLIENT_SCRIPT = `
+const token = localStorage.getItem('jwtToken');
+const api = (path, options = {}) => fetch('/api/' + path, {
+  ...options,
+  headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Token ' + token } : {}) },
+});
+async function renderNav() {
+  const slot = document.getElementById('nav-user');
+  if (!token) { slot.innerHTML = '<a href="/login">Sign in</a>'; return; }
+  const res = await api('user');
+  if (!res.ok) { slot.innerHTML = '<a href="/login">Sign in</a>'; return; }
+  const { user } = await res.json();
+  slot.innerHTML = '<a href="/editor">New Article</a> <span data-testid="current-user"></span>';
+  slot.querySelector('[data-testid=current-user]').textContent = user.username;
+}
+function renderEditor() {
+  const root = document.getElementById('editor');
+  if (!root) return;
+  if (!token) { root.innerHTML = '<p>Чтобы написать статью, <a href="/login">Sign in</a></p>'; return; }
+  root.innerHTML = '<form>'
+    + '<input name="title" placeholder="Article Title">'
+    + '<input name="description" placeholder="What\\'s this article about?">'
+    + '<textarea name="body" placeholder="Write your article (in markdown)"></textarea>'
+    + '<button type="submit">Publish Article</button></form>';
+  root.querySelector('form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(event.target));
+    const res = await api('articles', { method: 'POST', body: JSON.stringify({ article: data }) });
+    if (res.ok) {
+      const { article } = await res.json();
+      location.href = '/article/' + encodeURIComponent(article.slug);
+    }
+  });
+}
+renderNav();
+renderEditor();
+`;
+
 const sendHtml = (res, status, title, content) => {
   res.writeHead(status, { 'content-type': 'text/html; charset=utf-8' });
   res.end(`<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
-<body><nav><a href="/">conduit</a></nav><main>${content}</main></body></html>`);
+<body><nav><a href="/">conduit</a> <span id="nav-user"></span></nav><main>${content}</main>
+<script>${CLIENT_SCRIPT}</script></body></html>`);
 };
 
 const isAuthorized = (req) => req.headers.authorization === `Token ${TOKEN}`;
@@ -56,6 +99,11 @@ createServer(async (req, res) => {
       return sendJson(res, 401, { errors: { credentials: ['invalid'] } });
     }
     return sendJson(res, 200, { user: { email, username: DEMO_USER.username, token: TOKEN } });
+  }
+
+  if (req.method === 'GET' && path === '/api/user') {
+    if (!isAuthorized(req)) return sendJson(res, 401, { errors: { auth: ['unauthorized'] } });
+    return sendJson(res, 200, { user: { email: DEMO_USER.email, username: DEMO_USER.username, token: TOKEN } });
   }
 
   if (req.method === 'POST' && path === '/api/articles') {
@@ -87,6 +135,14 @@ createServer(async (req, res) => {
       .map((a) => `<li><a href="/article/${encodeURIComponent(a.slug)}">${escapeHtml(a.title)}</a></li>`)
       .join('');
     return sendHtml(res, 200, 'Conduit', `<h1>conduit</h1><ul>${items || '<li>Статей пока нет</li>'}</ul>`);
+  }
+
+  if (req.method === 'GET' && path === '/editor') {
+    return sendHtml(res, 200, 'Editor', '<h1>Новая статья</h1><div id="editor"></div>');
+  }
+
+  if (req.method === 'GET' && path === '/login') {
+    return sendHtml(res, 200, 'Sign in', '<h1>Sign in</h1><p>В demo-app вход выполняется через API.</p>');
   }
 
   const uiArticle = path.match(/^\/article\/([^/]+)$/);
