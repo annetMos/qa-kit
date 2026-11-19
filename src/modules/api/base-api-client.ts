@@ -61,6 +61,29 @@ export abstract class BaseApiClient {
     await this.assertStatus(await this.request.delete(url), expectedStatus);
   }
 
+  /**
+   * Send any request, check the status and return the raw response.
+   * Use it when the response has no JSON body (e.g. `204 No Content`) or when you need headers.
+   * @param method - HTTP method: `'GET'`, `'POST'`, `'PUT'`, `'PATCH'` or `'DELETE'`.
+   * @param url - Path relative to `API_URL`, without a leading slash.
+   * @param data - Optional JSON body.
+   * @param expectedStatus - Status code the request must return. Default: `200`.
+   * @example
+   * ```ts
+   * await this.send('POST', 'session', { email, password }, 204);
+   * ```
+   */
+  protected async send(
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+    url: string,
+    data?: unknown,
+    expectedStatus = 200,
+  ): Promise<APIResponse> {
+    const response = await this.request.fetch(url, { method, data });
+    await this.assertStatus(response, expectedStatus);
+    return response;
+  }
+
   private async parse<T>(response: APIResponse, expectedStatus: number): Promise<T> {
     await this.assertStatus(response, expectedStatus);
     return (await response.json()) as T;

@@ -66,7 +66,14 @@ test.describe('User', () => {
 - Login happens **via the API once per role per worker**, and the session is reused — no UI login in tests.
 - `authorizedApi` is an API context with the current role's token.
 - Roles are defined by the `users` fixture in `app/fixtures.ts` (by default, a single `user` role from `USER_EMAIL` / `USER_PASSWORD`).
-- How to log in to your application is described by a strategy in `app/auth/`. If your frontend keeps a token in localStorage, extend `TokenAuthStrategy` and specify the key and how to get the token (see `ConduitAuthStrategy`).
+- How to log in to your application is described by a strategy in `app/auth/`. Pick the base class by where your app keeps the session (check DevTools → Application):
+
+| Session is kept in | Extend | You write | Example |
+|---|---|---|---|
+| localStorage (token) | `TokenAuthStrategy` | the localStorage key and how to get a token | `app/auth/conduit-auth.strategy.ts` |
+| a cookie (incl. HttpOnly) | `CookieAuthStrategy` | the login request — the server sets the cookie | `app/auth/demo-cookie-auth.strategy.ts` |
+
+Then plug it into the `authStrategy` fixture in `app/fixtures.ts`.
 
 ## Test data (`test-data` module)
 Builders create valid objects with defaults, so a test sets only the fields it cares about. Defaults are recalculated on every build, so unique values never repeat — even across parallel workers.
@@ -83,7 +90,7 @@ Need a builder for your own entity? Extend `Builder<T>` and implement `defaults(
 src/core/          core: environment config, module interface
 src/modules/ui/    BasePage — base for Page Objects
 src/modules/api/   BaseApiClient, api and cleanup fixtures
-src/modules/auth/  role-based login: TokenAuthStrategy, SessionManager
+src/modules/auth/  role-based login: TokenAuthStrategy, CookieAuthStrategy, SessionManager
 src/modules/test-data/  Builder base class and unique value helpers
 src/fixtures.ts    module composition via mergeTests
 app/               application-specific code (clients, pages, fixtures)
@@ -99,7 +106,7 @@ Enable or disable modules in `src/fixtures.ts` (`mergeTests(...)`) and `src/modu
 |---|---|---|
 | `ui` | ✅ | `BasePage` for Page Objects |
 | `api` | ✅ | `BaseApiClient`, `api`, `cleanup` |
-| `auth` | ✅ | login via API once per role; browser and API already authenticated |
+| `auth` | ✅ | login via API once per role (token or cookie session); browser and API already authenticated |
 | `test-data` | ✅ | builders with valid defaults, unique values safe for parallel runs |
 | `reporting` | 🗓 planned | Allure |
 

@@ -4,13 +4,14 @@ import { ModuleManifest } from '../../core/module';
 import { SessionManager } from './session-manager';
 import { AuthStrategy, UsersByRole } from './types';
 
+export { CookieAuthStrategy } from './cookie-auth-strategy';
 export { SessionManager } from './session-manager';
 export { TokenAuthStrategy } from './token-auth-strategy';
 export type { AuthStrategy, Credentials, Session, StorageState, UsersByRole } from './types';
 
 export const authManifest: ModuleManifest = {
   name: 'auth',
-  description: 'Logs in via the API once per role; the browser and API requests are already authenticated',
+  description: 'Logs in via the API once per role (token or cookie); the browser and API requests are already authenticated',
   fixtures: ['role (option)', 'authorizedApi', 'sessions', 'users', 'authStrategy'],
   example: `test.use({ role: 'user' }); test('...', async ({ page, authorizedApi }) => { ... });`,
 };
@@ -54,8 +55,9 @@ export type AuthTestFixtures = {
 
 export type AuthWorkerFixtures = {
   /**
-   * How to log in to your application. Override it in `app/fixtures.ts`,
-   * usually with a `TokenAuthStrategy` subclass.
+   * How to log in to your application. Override it in `app/fixtures.ts` with a
+   * `TokenAuthStrategy` subclass (token in localStorage) or a `CookieAuthStrategy`
+   * subclass (session cookie).
    */
   authStrategy: AuthStrategy;
   /**
@@ -110,6 +112,8 @@ export const test = base.extend<AuthTestOptions & AuthTestFixtures, AuthWorkerFi
     const session = await sessions.session(role ?? sessions.defaultRole);
     const context = await playwrightRequest.newContext({
       baseURL: EnvConfig.get().apiUrl,
+      // Cookies for cookie sessions, headers for token sessions
+      storageState: session.storageState,
       extraHTTPHeaders: { ...session.apiHeaders },
     });
     await use(context);

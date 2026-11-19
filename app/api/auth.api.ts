@@ -21,4 +21,12 @@ export class AuthApi extends BaseApiClient {
     const body = await this.post<LoginResponse>('users/login', { user: { email, password } }, 200);
     return body.user.token;
   }
+
+  /**
+   * Start a cookie session (demo-app endpoint). Expects status 204.
+   * The server answers with an HttpOnly `sid` cookie, kept in this request context.
+   */
+  async startSession(email: string, password: string): Promise<void> {
+    await this.send('POST', 'session', { email, password }, 204);
+  }
 }

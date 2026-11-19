@@ -27,7 +27,7 @@ export type StorageState = Awaited<ReturnType<BrowserContext['storageState']>>;
 export type Session = {
   /** Cookies and localStorage the browser starts with. */
   readonly storageState: StorageState;
-  /** Headers added to API requests, e.g. `{ Authorization: 'Bearer …' }`. */
+  /** Headers added to API requests, e.g. `{ Authorization: 'Bearer …' }`. Empty for cookie sessions. */
   readonly apiHeaders: Readonly<Record<string, string>>;
 };
 
@@ -35,7 +35,7 @@ export type Session = {
  * Describes **how** to log in to your application via the API.
  *
  * Usually you don't implement this interface directly — extend `TokenAuthStrategy`
- * (token in localStorage). Plug the strategy in via the `authStrategy` fixture in `app/fixtures.ts`.
+ * (token in localStorage) or `CookieAuthStrategy` (session cookie). Plug the strategy in via the `authStrategy` fixture in `app/fixtures.ts`.
  *
  * @see {@link https://github.com/annetMos/qa-kit#authentication-auth-module | README: Authentication}
  */

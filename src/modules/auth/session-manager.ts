@@ -63,7 +63,8 @@ export class SessionManager {
   }
 
   private async login(role: string, credentials: Credentials): Promise<Session> {
-    const api = await request.newContext({ baseURL: this.apiUrl });
+    // Explicitly empty: login must start from a clean state, not from another role's cookies
+    const api = await request.newContext({ baseURL: this.apiUrl, storageState: { cookies: [], origins: [] } });
     try {
       return await this.strategy.login(api, credentials);
     } catch (error) {

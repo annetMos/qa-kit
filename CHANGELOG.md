@@ -3,7 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+## [0.3.0] — 2026-11-19
 ### Added
+- `CookieAuthStrategy` for applications that keep the session in a cookie (incl. HttpOnly); `DemoCookieAuthStrategy` example.
+- `BaseApiClient.send()` for requests without a JSON response body.
+- demo-app: cookie session login (`POST /api/session`).
+- `auth-cookie.spec.ts`: cookie session tests, including a guest test that relies only on `authorizedApi`.
 - Beginner guide: `docs/first-test.md` — from a manual test case to an automated test.
 - `.vscode/extensions.json` recommending the official Playwright Test for VSCode extension.
 - `test-data` module: `Builder<T>` base class and `unique` helpers (`id`, `email`, `title`) safe for parallel runs.
@@ -11,6 +17,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Hover hints for the whole public API: descriptions, parameters, return values, usage examples and links to the README.
 - "Writing hover hints" template in `CONTRIBUTING.md`.
+
+### Fixed
+- In tests with a role, the guest `api` fixture could inherit the role's session cookie and become authenticated. `api` and login requests now always start from an empty state.
+- `authorizedApi` now carries session cookies, not only headers.
 
 ### Changed
 - Tests and the beginner guide use builders instead of hard-coded data and `Date.now()`.

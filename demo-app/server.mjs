@@ -10,6 +10,7 @@ import { createServer } from 'node:http';
 const PORT = Number(process.env.DEMO_PORT ?? 4555);
 const DEMO_USER = { email: 'qa@example.com', password: 'qa-password', username: 'qa' };
 const TOKEN = 'demo-jwt-token';
+const SESSION_ID = 'demo-session-id';
 
 /** @type {Map<string, {slug: string, title: string, description: string, body: string, tagList: string[], createdAt: string}>} */
 const articles = new Map();
@@ -27,7 +28,8 @@ const sendJson = (res, status, body) => {
 
 /**
  * Client script: like the Conduit frontend, the token is kept in localStorage (jwtToken).
- * The header shows the current user; the editor works only with a token.
+ * The header shows the current user; the editor works only for a logged-in user
+ * (token in localStorage or session cookie — cookies are sent by the browser automatically).
  */
 const CLIENT_SCRIPT = `
 const token = localStorage.getItem('jwtToken');
@@ -35,19 +37,18 @@ const api = (path, options = {}) => fetch('/api/' + path, {
   ...options,
   headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Token ' + token } : {}) },
 });
+const currentUser = api('user').then((res) => (res.ok ? res.json().then((body) => body.user) : null));
 async function renderNav() {
   const slot = document.getElementById('nav-user');
-  if (!token) { slot.innerHTML = '<a href="/login">Sign in</a>'; return; }
-  const res = await api('user');
-  if (!res.ok) { slot.innerHTML = '<a href="/login">Sign in</a>'; return; }
-  const { user } = await res.json();
+  const user = await currentUser;
+  if (!user) { slot.innerHTML = '<a href="/login">Sign in</a>'; return; }
   slot.innerHTML = '<a href="/editor">New Article</a> <span data-testid="current-user"></span>';
   slot.querySelector('[data-testid=current-user]').textContent = user.username;
 }
-function renderEditor() {
+async function renderEditor() {
   const root = document.getElementById('editor');
   if (!root) return;
-  if (!token) { root.innerHTML = '<p>To write an article, <a href="/login">Sign in</a></p>'; return; }
+  if (!(await currentUser)) { root.innerHTML = '<p>To write an article, <a href="/login">Sign in</a></p>'; return; }
   root.innerHTML = '<form>'
     + '<input name="title" placeholder="Article Title">'
     + '<input name="description" placeholder="What\\'s this article about?">'
@@ -74,7 +75,15 @@ const sendHtml = (res, status, title, content) => {
 <script>${CLIENT_SCRIPT}</script></body></html>`);
 };
 
-const isAuthorized = (req) => req.headers.authorization === `Token ${TOKEN}`;
+const readCookie = (req, name) =>
+  (req.headers.cookie ?? '')
+    .split(';')
+    .map((part) => part.trim().split('='))
+    .find(([key]) => key === name)?.[1];
+
+/** Two ways to log in, like real apps: a token header (Conduit style) or a session cookie. */
+const isAuthorized = (req) =>
+  req.headers.authorization === `Token ${TOKEN}` || readCookie(req, 'sid') === SESSION_ID;
 
 const readJson = async (req) => {
   let raw = '';
@@ -99,6 +108,15 @@ createServer(async (req, res) => {
       return sendJson(res, 401, { errors: { credentials: ['invalid'] } });
     }
     return sendJson(res, 200, { user: { email, username: DEMO_USER.username, token: TOKEN } });
+  }
+
+  if (req.method === 'POST' && path === '/api/session') {
+    const { email, password } = body;
+    if (email !== DEMO_USER.email || password !== DEMO_USER.password) {
+      return sendJson(res, 401, { errors: { credentials: ['invalid'] } });
+    }
+    res.writeHead(204, { 'set-cookie': `sid=${SESSION_ID}; HttpOnly; Path=/; SameSite=Lax` });
+    return res.end();
   }
 
   if (req.method === 'GET' && path === '/api/user') {

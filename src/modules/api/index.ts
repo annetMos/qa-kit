@@ -3,6 +3,8 @@ import { EnvConfig } from '../../core/config';
 import { ModuleManifest } from '../../core/module';
 import { CleanupRegistry } from './cleanup';
 
+const EMPTY_STORAGE_STATE = { cookies: [], origins: [] };
+
 export { BaseApiClient } from './base-api-client';
 export { CleanupRegistry } from './cleanup';
 
@@ -43,7 +45,12 @@ export type ApiFixtures = {
 
 export const test = base.extend<ApiFixtures>({
   api: async ({}, use) => {
-    const context = await playwrightRequest.newContext({ baseURL: EnvConfig.get().apiUrl });
+    const context = await playwrightRequest.newContext({
+      baseURL: EnvConfig.get().apiUrl,
+      // Explicitly empty: inside a test Playwright would otherwise reuse the browser's
+      // storageState, and a role's session cookie would leak into this guest client.
+      storageState: EMPTY_STORAGE_STATE,
+    });
     await use(context);
     await context.dispose();
   },

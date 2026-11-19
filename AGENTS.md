@@ -19,6 +19,6 @@ This project is qa-kit, a Playwright + TypeScript test automation framework. Tes
 6. Use `test.step` with clear step names.
 7. Locators: `getByRole` / `getByLabel` / `getByTestId`; CSS only as a last resort.
 8. No `waitForTimeout` — only web-first assertions `expect(...)`.
-9. For logged-in scenarios use `test.use({ role: '<role>' })`, not a UI login. A new application gets its own strategy in `app/auth/`.
+9. For logged-in scenarios use `test.use({ role: '<role>' })`, not a UI login. A new application gets its own strategy in `app/auth/`: `TokenAuthStrategy` for a token in localStorage, `CookieAuthStrategy` for a session cookie.
 10. Shared page parts (header, menu) are separate components in `app/pages/*.component.ts`.
 11. Run `npm run typecheck` after changes.
