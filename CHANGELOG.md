@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 - Beginner guide: `docs/first-test.md` — from a manual test case to an automated test.
 - `.vscode/extensions.json` recommending the official Playwright Test for VSCode extension.
+- `test-data` module: `Builder<T>` base class and `unique` helpers (`id`, `email`, `title`) safe for parallel runs.
+- `ArticleBuilder` example in `app/data/`.
+
+- Hover hints for the whole public API: descriptions, parameters, return values, usage examples and links to the README.
+- "Writing hover hints" template in `CONTRIBUTING.md`.
+
+### Changed
+- Tests and the beginner guide use builders instead of hard-coded data and `Date.now()`.
 
 ## [0.2.0] — 2026-11-19
 ### Added

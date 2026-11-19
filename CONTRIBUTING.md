@@ -22,8 +22,34 @@ npm run check   # typecheck + tests against the demo-app
 - TypeScript in strict mode, no `any`.
 - OOP: base classes define shared behavior (`BasePage`, `BaseApiClient`), subclasses add only their own. One class — one responsibility.
 - Modules don't depend on each other; the core knows nothing about specific modules.
-- Every public method has JSDoc: what it does and a short example. These are the IDE hints for newcomers.
+- Every public class, method, fixture and locator has JSDoc — these are the hover hints newcomers rely on. See [Writing hover hints](#writing-hover-hints).
 - Error messages are human-readable: what went wrong and what to do.
+
+## Writing hover hints
+When someone hovers over a method in VS Code, they should understand it without opening the docs. Use this template:
+
+````ts
+/**
+ * What it does — one line, in plain words.
+ *
+ * When to use it, what to watch out for (optional, 1–3 lines).
+ *
+ * @param name - What to pass, with a typical value.
+ * @returns What comes back (skip for `void`).
+ * @throws When it fails, if the error is something the user may hit.
+ * @example
+ * ```ts
+ * // a short, real usage from a test
+ * ```
+ * @see {@link https://github.com/annetMos/qa-kit#section | README: Section} (optional)
+ */
+````
+
+Tips:
+- Write for someone coming from manual testing: avoid jargon or explain it in a few words.
+- Wrap examples in a ` ```ts ` block — VS Code highlights them in the hint.
+- Document fixtures on their type (e.g. `ApiFixtures`) — that's what shows up when hovering over a test argument.
+- Locators get a one-line comment: which element it is and when it is visible.
 
 ## Adding a module
 1. Create `src/modules/<name>/` with an `index.ts` that exports `test` (fixtures) and `<name>Manifest`.

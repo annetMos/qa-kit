@@ -1,19 +1,35 @@
 type CleanupTask = { readonly description: string; readonly run: () => Promise<void> };
 
 /**
- * Test data cleanup registry.
- * Create an entity → register its removal → everything is removed after the test
- * in reverse order, even if the test failed.
+ * Removes test data after the test — even if the test fails.
+ *
+ * Right after creating something, register how to remove it. Tasks run after the test
+ * in reverse order (last created — first removed), so dependent data is removed safely.
+ * A failed cleanup doesn't fail the test; it is reported as a warning.
+ *
+ * @example
+ * ```ts
+ * const article = await articlesApi.create(new ArticleBuilder().build());
+ * cleanup.add(`article ${article.slug}`, () => articlesApi.remove(article.slug));
+ * ```
  */
 export class CleanupRegistry {
   private readonly tasks: CleanupTask[] = [];
 
-  /** Register an action to run after the test. */
+  /**
+   * Register a removal action to run after the test.
+   * @param description - What is removed — shown in the warning if removal fails.
+   * @param run - Async function that removes the data, usually an API client call.
+   * @example
+   * ```ts
+   * cleanup.add('user anna', () => usersApi.remove(user.id));
+   * ```
+   */
   add(description: string, run: () => Promise<void>): void {
     this.tasks.push({ description, run });
   }
 
-  /** Called by the fixture automatically — no need to call it manually. */
+  /** Run all registered tasks. Called by the framework — you don't need to call it. */
   async runAll(): Promise<void> {
     const errors: string[] = [];
     for (const task of [...this.tasks].reverse()) {

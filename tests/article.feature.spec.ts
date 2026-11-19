@@ -1,4 +1,5 @@
 import { expect, test } from '../app/fixtures';
+import { ArticleBuilder } from '../app/data/article.builder';
 import { ArticlePage } from '../app/pages/article.page';
 
 /**
@@ -10,11 +11,7 @@ import { ArticlePage } from '../app/pages/article.page';
 test.describe('Feature: article publishing', () => {
   test('article created via API is shown on its page', async ({ page, articlesApi, cleanup }) => {
     const article = await test.step('Create an article via API', async () => {
-      const created = await articlesApi.create({
-        title: `Autotest ${Date.now()}`,
-        description: 'Created by an autotest',
-        body: 'Article text from an autotest',
-      });
+      const created = await articlesApi.create(new ArticleBuilder().build());
       cleanup.add(`article ${created.slug}`, () => articlesApi.remove(created.slug));
       return created;
     });

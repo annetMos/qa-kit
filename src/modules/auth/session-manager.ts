@@ -2,24 +2,34 @@ import { request } from '@playwright/test';
 import { AuthStrategy, Credentials, Session, UsersByRole } from './types';
 
 /**
- * Keeps sessions by role within a single worker:
- * each role logs in once, then the session is reused.
+ * Logs in each role **once per worker** and reuses the session in all its tests.
+ *
+ * Used by the `auth` fixtures — tests normally don't touch it directly.
+ * A failed login is not cached, so the next test tries again.
  */
 export class SessionManager {
   private readonly cache = new Map<string, Promise<Session>>();
 
+  /**
+   * @param strategy - How to log in (from the `authStrategy` fixture).
+   * @param users - Credentials by role (from the `users` fixture).
+   * @param apiUrl - API base URL used for login requests.
+   */
   constructor(
     private readonly strategy: AuthStrategy,
     private readonly users: UsersByRole,
     private readonly apiUrl: string,
   ) {}
 
-  /** All available roles. */
+  /** Names of all configured roles, e.g. `['user', 'admin']`. */
   get roles(): string[] {
     return Object.keys(this.users);
   }
 
-  /** Default role — the first one in the users list. */
+  /**
+   * Default role — the first one in `users`. Used by `authorizedApi` in guest tests.
+   * @throws If no users are configured.
+   */
   get defaultRole(): string {
     const [first] = this.roles;
     if (!first) {
@@ -28,7 +38,11 @@ export class SessionManager {
     return first;
   }
 
-  /** Get a session for the role (logs in on first access). */
+  /**
+   * Get the session of a role; logs in on first access.
+   * @param role - Role name from `users`, e.g. `'admin'`.
+   * @throws If the role is unknown — the message lists available roles.
+   */
   session(role: string): Promise<Session> {
     const credentials = this.users[role];
     if (!credentials) {

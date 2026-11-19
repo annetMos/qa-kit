@@ -4,7 +4,20 @@ import { ArticlesApi } from './api/articles.api';
 import { ConduitAuthStrategy } from './auth/conduit-auth.strategy';
 
 type AppFixtures = {
-  /** Articles API on behalf of the current role (or the default role). */
+  /**
+   * Typed articles API, already authenticated as the current role
+   * (or the default role if the test is a guest).
+   *
+   * Created test data is removed through `cleanup` before this client is closed.
+   *
+   * @example
+   * ```ts
+   * test('...', async ({ articlesApi, cleanup }) => {
+   *   const article = await articlesApi.create(new ArticleBuilder().build());
+   *   cleanup.add(`article ${article.slug}`, () => articlesApi.remove(article.slug));
+   * });
+   * ```
+   */
   articlesApi: ArticlesApi;
 };
 

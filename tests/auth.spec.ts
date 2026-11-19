@@ -1,4 +1,5 @@
 import { expect, test } from '../app/fixtures';
+import { ArticleBuilder } from '../app/data/article.builder';
 import { ArticlePage } from '../app/pages/article.page';
 import { EditorPage } from '../app/pages/editor.page';
 import { HeaderComponent } from '../app/pages/header.component';
@@ -24,24 +25,24 @@ test.describe('User', () => {
   });
 
   test('article published via UI is available via API', async ({ page, articlesApi, cleanup }) => {
-    const title = `UI ${Date.now()}`;
+    const draft = new ArticleBuilder().withBody('Text from the editor').build();
 
     await test.step('Publish an article in the editor', async () => {
       const editor = await new EditorPage(page).open();
-      await editor.publish({ title, description: 'Created via UI', body: 'Text from the editor' });
+      await editor.publish(draft);
     });
 
     const slug = await test.step('Wait for the article page', async () => {
       await expect(page).toHaveURL(/\/article\//);
       const slugFromUrl = decodeURIComponent(new URL(page.url()).pathname.split('/').pop() ?? '');
       cleanup.add(`article ${slugFromUrl}`, () => articlesApi.remove(slugFromUrl));
-      await expect(new ArticlePage(page, slugFromUrl).title).toHaveText(title);
+      await expect(new ArticlePage(page, slugFromUrl).title).toHaveText(draft.title);
       return slugFromUrl;
     });
 
     await test.step('Check the article via API', async () => {
       const article = await articlesApi.getBySlug(slug);
-      expect(article).toMatchObject({ title, body: 'Text from the editor' });
+      expect(article).toMatchObject({ title: draft.title, body: draft.body });
     });
   });
 });

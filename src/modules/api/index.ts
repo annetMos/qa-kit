@@ -14,9 +14,30 @@ export const apiManifest: ModuleManifest = {
 };
 
 export type ApiFixtures = {
-  /** Request context for API_URL (unauthenticated). */
+  /**
+   * Raw HTTP client for `API_URL` **without** authentication.
+   *
+   * Good for negative checks (e.g. "no token → 401"). For regular calls prefer typed
+   * clients like `articlesApi`, and `authorizedApi` for logged-in requests.
+   * Paths are relative, without a leading slash.
+   *
+   * @example
+   * ```ts
+   * const response = await api.post('articles', { data: { article } });
+   * expect(response.status()).toBe(401);
+   * ```
+   */
   api: APIRequestContext;
-  /** Register test data removal after the test. */
+
+  /**
+   * Removes test data after the test — even if the test fails.
+   *
+   * @example
+   * ```ts
+   * const article = await articlesApi.create(new ArticleBuilder().build());
+   * cleanup.add(`article ${article.slug}`, () => articlesApi.remove(article.slug));
+   * ```
+   */
   cleanup: CleanupRegistry;
 };
 

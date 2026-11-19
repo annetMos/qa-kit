@@ -17,23 +17,54 @@ export const authManifest: ModuleManifest = {
 
 export type AuthTestOptions = {
   /**
-   * Role the test runs as. No role — guest.
-   * @example test.use({ role: 'admin' });
+   * Role the test runs as. Without a role the test is a **guest**.
+   *
+   * With a role, the browser starts already logged in and `authorizedApi` uses the same
+   * session — there is no UI login in the test. Each role logs in once per worker.
+   * Roles are defined by the `users` fixture in `app/fixtures.ts`.
+   *
+   * @example
+   * ```ts
+   * test.describe('Admin', () => {
+   *   test.use({ role: 'admin' });
+   *
+   *   test('sees the admin panel', async ({ page }) => { ... });
+   * });
+   * ```
+   * @see {@link https://github.com/annetMos/qa-kit#authentication-auth-module | README: Authentication}
    */
   role: string | undefined;
 };
 
 export type AuthTestFixtures = {
-  /** API context authenticated as the current role (or the default role if the test is a guest). */
+  /**
+   * HTTP client for `API_URL` **with** authentication of the current role
+   * (or the default role if the test is a guest).
+   *
+   * Pass it to typed API clients, or call it directly.
+   *
+   * @example
+   * ```ts
+   * const response = await authorizedApi.get('user');
+   * expect(response.ok()).toBeTruthy();
+   * ```
+   */
   authorizedApi: APIRequestContext;
 };
 
 export type AuthWorkerFixtures = {
-  /** How to log in to the application. Overridden in app/fixtures.ts. */
+  /**
+   * How to log in to your application. Override it in `app/fixtures.ts`,
+   * usually with a `TokenAuthStrategy` subclass.
+   */
   authStrategy: AuthStrategy;
-  /** Users by role. Defaults to a single `user` role from USER_EMAIL / USER_PASSWORD. */
+  /**
+   * Test users by role; the first role is the default one.
+   * Default: a single `user` role from `USER_EMAIL` / `USER_PASSWORD`.
+   * Override it in `app/fixtures.ts` to add roles.
+   */
   users: UsersByRole;
-  /** Session cache by role within a worker. */
+  /** Session cache by role within a worker. Rarely needed in tests directly. */
   sessions: SessionManager;
 };
 

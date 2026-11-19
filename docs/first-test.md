@@ -38,6 +38,7 @@ Every part of a manual test case has a place in an automated test:
 
 | Manual test case | qa-kit | Why |
 |---|---|---|
+| Test data | Builder (`ArticleBuilder`) | Valid defaults; you set only what matters for the test |
 | Precondition | API client (`articlesApi`) | Preparing data through the API is fast and stable |
 | Cleanup after the test | `cleanup.add(...)` | Test data is removed even if the test fails |
 | Steps in the UI | Page Object (`ArticlePage`) | Locators live in one place, tests stay readable |
@@ -50,6 +51,7 @@ Create `tests/my-first.spec.ts`. Always import `test` and `expect` from `app/fix
 
 ```ts
 import { expect, test } from '../app/fixtures';
+import { ArticleBuilder } from '../app/data/article.builder';
 import { ArticlePage } from '../app/pages/article.page';
 ```
 
@@ -59,11 +61,7 @@ import { ArticlePage } from '../app/pages/article.page';
 test('deleted article is no longer available', async ({ page, articlesApi }) => {
   // Precondition: an article exists
   const article = await test.step('Create an article via API', async () => {
-    return articlesApi.create({
-      title: `First test ${Date.now()}`,
-      description: 'My first automated test',
-      body: 'Hello, automation!',
-    });
+    return articlesApi.create(new ArticleBuilder().withBody('Hello, automation!').build());
   });
 
   // Step 1: delete the article
@@ -82,7 +80,7 @@ test('deleted article is no longer available', async ({ page, articlesApi }) => 
 What is happening here:
 - `async ({ page, articlesApi }) => …` — the test asks for **fixtures**: ready-made objects the framework prepares for you. `page` is a browser tab, `articlesApi` is an authenticated API client. Type `async ({ ` and press `Ctrl+Space` in VS Code to see all available fixtures.
 - `test.step(...)` — names a step. Steps show up in reports, so a failed test reads like a manual test case.
-- `Date.now()` makes the title unique, so tests don't interfere with each other.
+- `new ArticleBuilder()...build()` creates a valid article with a **unique title**, so tests running in parallel never interfere. Set only the fields your test cares about: `.withTitle(...)`, `.withBody(...)`, `.withTags(...)`.
 - We don't use `cleanup.add(...)` here because deleting the article *is* part of the test. In most tests you register cleanup right after creating data:
   ```ts
   cleanup.add(`article ${article.slug}`, () => articlesApi.remove(article.slug));
@@ -113,6 +111,7 @@ Put the correct text back before moving on.
 ## Good habits checklist
 
 - [ ] Prepare data via the API, check the result in the UI (or the other way around).
+- [ ] Create data with builders — no hard-coded titles or `Date.now()`.
 - [ ] Register `cleanup.add(...)` for everything you create.
 - [ ] No locators in tests — add them to a Page Object in `app/pages`.
 - [ ] No `waitForTimeout` — `expect(...)` already waits.
