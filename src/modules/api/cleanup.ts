@@ -1,19 +1,19 @@
 type CleanupTask = { readonly description: string; readonly run: () => Promise<void> };
 
 /**
- * Реестр очистки тестовых данных.
- * Создали сущность → зарегистрировали удаление → после теста всё удалится
- * в обратном порядке, даже если тест упал.
+ * Test data cleanup registry.
+ * Create an entity → register its removal → everything is removed after the test
+ * in reverse order, even if the test failed.
  */
 export class CleanupRegistry {
   private readonly tasks: CleanupTask[] = [];
 
-  /** Зарегистрировать действие, которое выполнится после теста. */
+  /** Register an action to run after the test. */
   add(description: string, run: () => Promise<void>): void {
     this.tasks.push({ description, run });
   }
 
-  /** Вызывается фикстурой автоматически — вручную не нужен. */
+  /** Called by the fixture automatically — no need to call it manually. */
   async runAll(): Promise<void> {
     const errors: string[] = [];
     for (const task of [...this.tasks].reverse()) {
@@ -25,7 +25,7 @@ export class CleanupRegistry {
     }
     this.tasks.length = 0;
     if (errors.length > 0) {
-      console.warn(`[cleanup] Не удалось очистить:\n- ${errors.join('\n- ')}`);
+      console.warn(`[cleanup] Failed to clean up:\n- ${errors.join('\n- ')}`);
     }
   }
 }

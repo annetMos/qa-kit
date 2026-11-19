@@ -1,15 +1,15 @@
 /**
- * Описание модуля фреймворка.
- * Каждый модуль (ui, api, auth, test-data…) экспортирует свой manifest —
- * по нему команда `npm run features` показывает, что подключено и что умеет.
+ * Module descriptor.
+ * Every module (ui, api, auth, test-data…) exports a manifest —
+ * `npm run features` uses it to show what is enabled and how to use it.
  */
 export interface ModuleManifest {
-  /** Короткое имя модуля, например `api`. */
+  /** Short module name, e.g. `api`. */
   readonly name: string;
-  /** Одна строка: зачем нужен модуль. */
+  /** One line: what the module is for. */
   readonly description: string;
-  /** Фикстуры, которые модуль добавляет в `test` (видны в автодополнении). */
+  /** Fixtures the module adds to `test` (visible in IDE autocompletion). */
   readonly fixtures: readonly string[];
-  /** Пример использования — показывается новичку в подсказке. */
+  /** Usage example shown as a hint for newcomers. */
   readonly example: string;
 }

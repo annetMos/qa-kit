@@ -1,25 +1,26 @@
 # Changelog
 
-Формат — [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/), версии — [SemVer](https://semver.org/lang/ru/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
 ## [0.2.0] — 2026-11-19
-### Добавлено
-- Модуль `auth`: опция `role`, фикстуры `authorizedApi`, `sessions`, `users`, `authStrategy`; вход через API один раз на роль в worker.
-- `TokenAuthStrategy` — основа для приложений с токеном в localStorage; пример `ConduitAuthStrategy`.
-- demo-app: шапка с текущим пользователем, `GET /api/user`, страница редактора.
-- Тесты `auth.spec.ts`: гость, залогиненный пользователь, сценарий «UI → API».
-- Page Object `EditorPage` и компонент `HeaderComponent`.
+### Added
+- `auth` module: `role` option, `authorizedApi`, `sessions`, `users`, `authStrategy` fixtures; login via API once per role per worker.
+- `TokenAuthStrategy` — base for applications that keep a token in localStorage; `ConduitAuthStrategy` example.
+- demo-app: header with the current user, `GET /api/user`, editor page.
+- `auth.spec.ts` tests: guest, logged-in user, "UI → API" scenario.
+- `EditorPage` Page Object and `HeaderComponent`.
 
-### Изменено
-- `articlesApi` использует сессию модуля `auth` вместо собственного входа.
+### Changed
+- `articlesApi` uses the `auth` module session instead of its own login.
+- All code, comments, documentation and test names are now in English.
 
 ## [0.1.0] — 2026-11-19
-### Добавлено
-- Ядро: `EnvConfig`, интерфейс `ModuleManifest`.
-- Модуль `ui`: `BasePage` для Page Object.
-- Модуль `api`: `BaseApiClient`, фикстуры `api` и `cleanup`.
-- Команда `npm run features`.
-- Встроенный `demo-app` в стиле RealWorld и примеры тестов API + UI.
-- CI на GitHub Actions, шаблоны issue и PR, `AGENTS.md`.
+### Added
+- Core: `EnvConfig`, `ModuleManifest` interface.
+- `ui` module: `BasePage` for Page Objects.
+- `api` module: `BaseApiClient`, `api` and `cleanup` fixtures.
+- `npm run features` command.
+- Built-in RealWorld-style `demo-app` and API + UI test examples.
+- GitHub Actions CI, issue and PR templates, `AGENTS.md`.

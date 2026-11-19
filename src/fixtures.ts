@@ -4,8 +4,8 @@ import { test as authTest } from './modules/auth';
 import { test as uiTest } from './modules/ui';
 
 /**
- * Базовый `test` фреймворка: объединяет фикстуры подключённых модулей.
- * Не нужен модуль — уберите его из списка, остальные продолжат работать.
+ * Framework base `test`: merges fixtures of all enabled modules.
+ * Don't need a module? Remove it from the list — the rest keep working.
  */
 export const test = mergeTests(uiTest, apiTest, authTest);
 export { expect } from '@playwright/test';

@@ -10,30 +10,30 @@ export type { AuthStrategy, Credentials, Session, StorageState, UsersByRole } fr
 
 export const authManifest: ModuleManifest = {
   name: 'auth',
-  description: 'Вход через API один раз на роль; браузер и API-запросы уже авторизованы',
-  fixtures: ['role (опция)', 'authorizedApi', 'sessions', 'users', 'authStrategy'],
+  description: 'Logs in via the API once per role; the browser and API requests are already authenticated',
+  fixtures: ['role (option)', 'authorizedApi', 'sessions', 'users', 'authStrategy'],
   example: `test.use({ role: 'user' }); test('...', async ({ page, authorizedApi }) => { ... });`,
 };
 
 export type AuthTestOptions = {
   /**
-   * Роль, под которой выполняется тест. Без роли — гость.
+   * Role the test runs as. No role — guest.
    * @example test.use({ role: 'admin' });
    */
   role: string | undefined;
 };
 
 export type AuthTestFixtures = {
-  /** API-контекст с авторизацией текущей роли (или роли по умолчанию, если тест гостевой). */
+  /** API context authenticated as the current role (or the default role if the test is a guest). */
   authorizedApi: APIRequestContext;
 };
 
 export type AuthWorkerFixtures = {
-  /** Как входить в приложение. Переопределяется в app/fixtures.ts. */
+  /** How to log in to the application. Overridden in app/fixtures.ts. */
   authStrategy: AuthStrategy;
-  /** Пользователи по ролям. По умолчанию одна роль `user` из USER_EMAIL / USER_PASSWORD. */
+  /** Users by role. Defaults to a single `user` role from USER_EMAIL / USER_PASSWORD. */
   users: UsersByRole;
-  /** Кэш сессий по ролям в рамках worker. */
+  /** Session cache by role within a worker. */
   sessions: SessionManager;
 };
 
@@ -43,8 +43,8 @@ export const test = base.extend<AuthTestOptions & AuthTestFixtures, AuthWorkerFi
   authStrategy: [
     async ({}, _use) => {
       throw new Error(
-        '[auth] Не задана стратегия входа. Переопределите фикстуру authStrategy в app/fixtures.ts ' +
-          '(например, наследником TokenAuthStrategy).',
+        '[auth] No login strategy configured. Override the authStrategy fixture in app/fixtures.ts ' +
+          '(for example, with a TokenAuthStrategy subclass).',
       );
     },
     { scope: 'worker' },
@@ -65,7 +65,7 @@ export const test = base.extend<AuthTestOptions & AuthTestFixtures, AuthWorkerFi
     { scope: 'worker' },
   ],
 
-  // Если задана роль — браузер стартует уже залогиненным
+  // When a role is set, the browser starts already logged in
   storageState: async ({ role, sessions, storageState }, use) => {
     if (!role) {
       await use(storageState);

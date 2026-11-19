@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 
-/** Шапка сайта — общая для всех страниц, поэтому компонент, а не страница. */
+/** Site header — shared by all pages, so it is a component, not a page. */
 export class HeaderComponent {
   readonly currentUser: Locator;
   readonly signInLink: Locator;

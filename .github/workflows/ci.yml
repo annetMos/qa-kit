@@ -17,19 +17,19 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Установить зависимости
+      - name: Install dependencies
         run: npm ci
 
-      - name: Проверка типов
+      - name: Type check
         run: npm run typecheck
 
-      - name: Установить браузер
+      - name: Install browser
         run: npx playwright install --with-deps chromium
 
-      - name: Тесты против demo-app
+      - name: Run tests against demo-app
         run: npm test
 
-      - name: Сохранить отчёт
+      - name: Upload report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:

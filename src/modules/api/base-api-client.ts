@@ -1,29 +1,29 @@
 import { APIRequestContext, APIResponse, expect } from '@playwright/test';
 
 /**
- * Базовый класс для API-клиентов проекта.
- * Наследники описывают конкретные ресурсы (статьи, пользователи…),
- * а здесь — общая логика: запросы, проверка статуса, понятные ошибки.
+ * Base class for the project's API clients.
+ * Subclasses describe specific resources (articles, users…);
+ * common logic lives here: requests, status checks, readable errors.
  */
 export abstract class BaseApiClient {
   protected constructor(protected readonly request: APIRequestContext) {}
 
-  /** GET с проверкой статуса; возвращает распарсенный JSON. */
+  /** GET with a status check; returns parsed JSON. */
   protected async get<T>(url: string, expectedStatus = 200): Promise<T> {
     return this.parse<T>(await this.request.get(url), expectedStatus);
   }
 
-  /** POST с проверкой статуса; возвращает распарсенный JSON. */
+  /** POST with a status check; returns parsed JSON. */
   protected async post<T>(url: string, data: unknown, expectedStatus = 201): Promise<T> {
     return this.parse<T>(await this.request.post(url, { data }), expectedStatus);
   }
 
-  /** PUT с проверкой статуса; возвращает распарсенный JSON. */
+  /** PUT with a status check; returns parsed JSON. */
   protected async put<T>(url: string, data: unknown, expectedStatus = 200): Promise<T> {
     return this.parse<T>(await this.request.put(url, { data }), expectedStatus);
   }
 
-  /** DELETE с проверкой статуса. */
+  /** DELETE with a status check. */
   protected async delete(url: string, expectedStatus = 204): Promise<void> {
     await this.assertStatus(await this.request.delete(url), expectedStatus);
   }
@@ -34,10 +34,10 @@ export abstract class BaseApiClient {
   }
 
   private async assertStatus(response: APIResponse, expectedStatus: number): Promise<void> {
-    const body = response.ok() ? '' : `\nТело ответа: ${await response.text()}`;
+    const body = response.ok() ? '' : `\nResponse body: ${await response.text()}`;
     expect(
       response.status(),
-      `[api] ${response.url()} вернул ${response.status()}, ожидали ${expectedStatus}.${body}`,
+      `[api] ${response.url()} returned ${response.status()}, expected ${expectedStatus}.${body}`,
     ).toBe(expectedStatus);
   }
 }

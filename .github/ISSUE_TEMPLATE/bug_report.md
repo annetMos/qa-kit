@@ -1,21 +1,21 @@
 ---
-name: Баг
-about: Что-то работает не так, как ожидалось
+name: Bug report
+about: Something doesn't work as expected
 labels: bug
 ---
 
-**Что произошло**
+**What happened**
 
-**Шаги воспроизведения**
+**Steps to reproduce**
 1.
 2.
 
-**Ожидаемый результат**
+**Expected result**
 
-**Окружение**
+**Environment**
 - qa-kit:
 - Node.js:
 - @playwright/test:
-- ОС:
+- OS:
 
-**Логи / скриншоты / trace**
+**Logs / screenshots / trace**

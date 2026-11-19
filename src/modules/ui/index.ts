@@ -5,10 +5,10 @@ export { BasePage } from './base-page';
 
 export const uiManifest: ModuleManifest = {
   name: 'ui',
-  description: 'Page Object для веб-интерфейса поверх Playwright Page',
+  description: 'Page Objects for the web UI on top of Playwright Page',
   fixtures: ['page (Playwright)'],
   example: `const article = await new ArticlePage(page, slug).open();`,
 };
 
-/** UI-модуль не добавляет фикстур — Page Object создаются из `page`. */
+/** The UI module adds no fixtures — Page Objects are created from `page`. */
 export const test = base;

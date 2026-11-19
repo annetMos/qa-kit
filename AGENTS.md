@@ -1,23 +1,24 @@
-# Инструкции для AI-агентов (Claude Code, Copilot, Playwright agents)
+# Guidelines for AI agents (Claude Code, Copilot, Playwright agents)
 
-Проект — фреймворк автотестов qa-kit на Playwright + TypeScript. Тесты проверяют фичу целиком: API + UI.
+This project is qa-kit, a Playwright + TypeScript test automation framework. Tests check a feature end to end: API + UI.
 
-## Архитектура
-- `src/core` — ядро (конфиг, интерфейс модуля). Не содержит логики конкретного проекта.
-- `src/modules/<name>` — подключаемые модули. Каждый экспортирует `test` с фикстурами и `manifest`.
-- `src/fixtures.ts` — объединение модулей через `mergeTests`.
-- `app/` — код конкретного тестируемого приложения: API-клиенты (`app/api`), Page Object (`app/pages`), фикстуры проекта (`app/fixtures.ts`).
-- `tests/` — только сценарии. Тесты импортируют `test`/`expect` из `app/fixtures`.
-- `demo-app/` — встроенное приложение для примеров и CI. Без `.env` тесты идут против него.
+## Architecture
+- `src/core` — core (config, module interface). Contains no project-specific logic.
+- `src/modules/<name>` — pluggable modules. Each exports `test` with fixtures and a `manifest`.
+- `src/fixtures.ts` — module composition via `mergeTests`.
+- `app/` — code for the application under test: API clients (`app/api`), Page Objects (`app/pages`), login strategy (`app/auth`), project fixtures (`app/fixtures.ts`).
+- `tests/` — scenarios only. Tests import `test`/`expect` from `app/fixtures`.
+- `demo-app/` — built-in application for examples and CI. Without `.env`, tests run against it.
 
-## Правила при написании тестов
-1. Данные готовить через API-клиенты из `app/api`, а не через UI.
-2. Каждую созданную сущность регистрировать в `cleanup.add(...)`.
-3. В тестах нет сырых локаторов — только Page Object из `app/pages`, наследники `BasePage`.
-4. Новый API-ресурс — новый класс-наследник `BaseApiClient`, по одному классу на ресурс.
-5. Шаги оформлять через `test.step` с понятными русскими названиями.
-6. Локаторы: `getByRole` / `getByLabel` / `getByTestId`; CSS — в крайнем случае.
-7. Без `waitForTimeout` — только веб-ориентированные проверки `expect(...)`.
-8. Для залогиненных сценариев — `test.use({ role: '<роль>' })`, а не вход через UI. Новое приложение — своя стратегия в `app/auth/`.
-9. Общие части страниц (шапка, меню) — отдельные компоненты в `app/pages/*.component.ts`.
-10. После изменений запускать `npm run typecheck`.
+## Rules for writing tests
+1. Everything is in English: code, comments, test names, step names, error messages.
+2. Set up data via API clients from `app/api`, not via the UI.
+3. Register every created entity with `cleanup.add(...)`.
+4. No raw locators in tests — only Page Objects from `app/pages` (subclasses of `BasePage`).
+5. A new API resource means a new `BaseApiClient` subclass — one class per resource.
+6. Use `test.step` with clear step names.
+7. Locators: `getByRole` / `getByLabel` / `getByTestId`; CSS only as a last resort.
+8. No `waitForTimeout` — only web-first assertions `expect(...)`.
+9. For logged-in scenarios use `test.use({ role: '<role>' })`, not a UI login. A new application gets its own strategy in `app/auth/`.
+10. Shared page parts (header, menu) are separate components in `app/pages/*.component.ts`.
+11. Run `npm run typecheck` after changes.

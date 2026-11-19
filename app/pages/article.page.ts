@@ -1,7 +1,7 @@
 import { Locator, Page } from '@playwright/test';
 import { BasePage } from '../../src/modules/ui';
 
-/** Страница статьи: /article/:slug. Селекторы — пример для Conduit, адаптируйте под свой проект. */
+/** Article page: /article/:slug. Selectors are a Conduit example — adapt them to your project. */
 export class ArticlePage extends BasePage {
   protected readonly path: string;
 

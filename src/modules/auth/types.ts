@@ -1,25 +1,25 @@
 import { APIRequestContext, BrowserContext } from '@playwright/test';
 
-/** Логин и пароль тестового пользователя. */
+/** Test user login and password. */
 export type Credentials = { readonly email: string; readonly password: string };
 
-/** Пользователи по ролям, например `{ user: {...}, admin: {...} }`. Первая роль — роль по умолчанию. */
+/** Users by role, e.g. `{ user: {...}, admin: {...} }`. The first role is the default one. */
 export type UsersByRole = Readonly<Record<string, Credentials>>;
 
-/** Состояние браузера: cookies и localStorage (формат Playwright `storageState`). */
+/** Browser state: cookies and localStorage (Playwright `storageState` format). */
 export type StorageState = Awaited<ReturnType<BrowserContext['storageState']>>;
 
-/** Результат входа: чем авторизовать браузер и чем — API-запросы. */
+/** Login result: what authenticates the browser and what authenticates API requests. */
 export type Session = {
   readonly storageState: StorageState;
   readonly apiHeaders: Readonly<Record<string, string>>;
 };
 
 /**
- * Стратегия входа в конкретное приложение.
- * Реализуйте её в `app/auth/` и подключите в `app/fixtures.ts`.
+ * Login strategy for a specific application.
+ * Implement it in `app/auth/` and plug it in via `app/fixtures.ts`.
  */
 export interface AuthStrategy {
-  /** Войти через API и вернуть сессию для браузера и API. */
+  /** Log in via the API and return a session for the browser and the API. */
   login(api: APIRequestContext, credentials: Credentials): Promise<Session>;
 }

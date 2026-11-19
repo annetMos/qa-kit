@@ -1,10 +1,10 @@
-## Что сделано
+## What was done
 
-## Зачем
+## Why
 
-## Чек-лист
-- [ ] `npm run typecheck` проходит
-- [ ] `npm test` проходит
-- [ ] Публичные методы описаны JSDoc с примером
-- [ ] Если добавлен модуль — есть `manifest` и запись в `src/modules/registry.ts`
-- [ ] Обновлён `CHANGELOG.md`
+## Checklist
+- [ ] `npm run typecheck` passes
+- [ ] `npm test` passes
+- [ ] Public methods have JSDoc with an example
+- [ ] If a module was added — it has a `manifest` and is listed in `src/modules/registry.ts`
+- [ ] `CHANGELOG.md` is updated

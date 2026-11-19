@@ -2,8 +2,8 @@ import { defineConfig, devices } from '@playwright/test';
 import 'dotenv/config';
 
 /**
- * Если BASE_URL не задан (нет .env) — тесты идут против встроенного demo-app,
- * который Playwright поднимет сам. Так `npm test` работает сразу после клонирования.
+ * If BASE_URL is not set (no .env), tests run against the built-in demo-app,
+ * which Playwright starts automatically. So `npm test` works right after cloning.
  */
 const useDemoApp = !process.env.BASE_URL;
 const DEMO_PORT = 4555;
@@ -29,7 +29,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      // PW_CHANNEL=chrome — запуск в установленном Google Chrome вместо браузера Playwright
+      // PW_CHANNEL=chrome — run in installed Google Chrome instead of Playwright's browser
       use: { ...devices['Desktop Chrome'], channel: process.env.PW_CHANNEL },
     },
   ],

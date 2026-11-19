@@ -8,15 +8,15 @@ export { CleanupRegistry } from './cleanup';
 
 export const apiManifest: ModuleManifest = {
   name: 'api',
-  description: 'HTTP-клиент к API, подготовка данных и автоочистка после теста',
+  description: 'HTTP client for the API, test data setup and automatic cleanup',
   fixtures: ['api', 'cleanup'],
   example: `test('...', async ({ api, cleanup }) => { /* api.post(...) */ });`,
 };
 
 export type ApiFixtures = {
-  /** Контекст запросов к API_URL (без авторизации). */
+  /** Request context for API_URL (unauthenticated). */
   api: APIRequestContext;
-  /** Регистрация удаления тестовых данных после теста. */
+  /** Register test data removal after the test. */
   cleanup: CleanupRegistry;
 };
 

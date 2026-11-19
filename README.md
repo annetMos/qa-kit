@@ -1,93 +1,93 @@
 # qa-kit
 
-Модульный каркас автотестов на **Playwright + TypeScript** для проверки фичи целиком: **API + UI**.
-Рассчитан на тех, кто переходит из ручного тестирования в автоматизацию: возможности видны из автодополнения и команды `npm run features`, лишние модули отключаются одной строкой.
+A modular **Playwright + TypeScript** test automation starter for checking a feature end to end: **API + UI**.
+Built for people moving from manual testing into automation: capabilities are discoverable through IDE autocompletion and `npm run features`, and unused modules can be switched off with one line.
 
-## Быстрый старт
+## Quick start
 
-Нужен Node.js 20+.
+Requires Node.js 20+.
 
 ```bash
-git clone <ссылка на репозиторий>
+git clone https://github.com/annetMos/qa-kit.git
 cd qa-kit
 npm install
 npx playwright install chromium
 npm test
 ```
 
-Без `.env` тесты запускаются против встроенного **demo-app** (мини-версия RealWorld/Conduit) — Playwright поднимает его сам.
+Without a `.env` file, tests run against the built-in **demo-app** (a mini RealWorld/Conduit clone) — Playwright starts it automatically.
 
-| Команда | Что делает |
+| Command | What it does |
 |---|---|
-| `npm test` | Запустить все тесты |
-| `npm run test:ui` | Режим UI Playwright: тесты, шаги, time-travel отладка |
-| `npm run report` | Открыть HTML-отчёт последнего прогона |
-| `npm run features` | Показать подключённые модули и примеры |
-| `npm run demo` | Запустить demo-app вручную: http://localhost:4555 |
-| `npm run typecheck` | Проверить типы |
+| `npm test` | Run all tests |
+| `npm run test:ui` | Playwright UI mode: tests, steps, time-travel debugging |
+| `npm run report` | Open the HTML report of the last run |
+| `npm run features` | Show enabled modules and usage examples |
+| `npm run demo` | Start the demo-app manually: http://localhost:4555 |
+| `npm run typecheck` | Type-check the project |
 
-## Как подключить своё приложение
-1. `cp .env.example .env` и указать адреса своего стенда и тестового пользователя.
-2. В `app/api` описать API-клиенты (наследники `BaseApiClient`), в `app/pages` — страницы (наследники `BasePage`).
-3. В `app/fixtures.ts` добавить фикстуры с вашими клиентами.
-4. Писать сценарии в `tests/`, импортируя `test` и `expect` из `app/fixtures`.
+## Using it with your application
+1. `cp .env.example .env` and set your environment URLs and test user.
+2. Describe API clients in `app/api` (subclasses of `BaseApiClient`) and pages in `app/pages` (subclasses of `BasePage`).
+3. Plug in your login strategy and clients in `app/fixtures.ts`.
+4. Write scenarios in `tests/`, importing `test` and `expect` from `app/fixtures`.
 
-## Пример теста
+## Test example
 ```ts
-test('статья, созданная через API, отображается на странице', async ({ page, articlesApi, cleanup }) => {
-  const article = await articlesApi.create({ title: 'Тест', description: '-', body: 'Текст' });
-  cleanup.add('статья', () => articlesApi.remove(article.slug)); // удалится после теста, даже если он упал
+test('article created via API is shown on its page', async ({ page, articlesApi, cleanup }) => {
+  const article = await articlesApi.create({ title: 'Test', description: '-', body: 'Text' });
+  cleanup.add('article', () => articlesApi.remove(article.slug)); // removed after the test, even if it fails
 
   const articlePage = await new ArticlePage(page, article.slug).open();
   await expect(articlePage.title).toHaveText(article.title);
 });
 ```
 
-## Авторизация (модуль `auth`)
-Тест без роли — гость. Чтобы браузер и API стартовали уже залогиненными, достаточно указать роль:
+## Authentication (`auth` module)
+A test without a role runs as a guest. To start the browser and the API already logged in, set a role:
 
 ```ts
-test.describe('Пользователь', () => {
+test.describe('User', () => {
   test.use({ role: 'user' });
 
-  test('видит своё имя в шапке', async ({ page }) => {
+  test('sees their name in the header', async ({ page }) => {
     await page.goto('/');
     await expect(new HeaderComponent(page).currentUser).toHaveText('qa');
   });
 });
 ```
 
-- Вход выполняется **через API один раз на роль в каждом worker**, сессия переиспользуется — UI-логина в тестах нет.
-- `authorizedApi` — API-контекст с токеном текущей роли.
-- Роли задаются фикстурой `users` в `app/fixtures.ts` (по умолчанию одна роль `user` из `USER_EMAIL` / `USER_PASSWORD`).
-- Как входить в ваше приложение, описывает стратегия в `app/auth/`. Если фронтенд хранит токен в localStorage — наследуйтесь от `TokenAuthStrategy` и укажите ключ и способ получения токена (см. `ConduitAuthStrategy`).
+- Login happens **via the API once per role per worker**, and the session is reused — no UI login in tests.
+- `authorizedApi` is an API context with the current role's token.
+- Roles are defined by the `users` fixture in `app/fixtures.ts` (by default, a single `user` role from `USER_EMAIL` / `USER_PASSWORD`).
+- How to log in to your application is described by a strategy in `app/auth/`. If your frontend keeps a token in localStorage, extend `TokenAuthStrategy` and specify the key and how to get the token (see `ConduitAuthStrategy`).
 
-## Структура
+## Project structure
 ```
-src/core/          ядро: конфиг окружения, интерфейс модуля
-src/modules/ui/    BasePage — основа для Page Object
-src/modules/api/   BaseApiClient, фикстуры api и cleanup
-src/modules/auth/  вход по ролям: TokenAuthStrategy, SessionManager
-src/fixtures.ts    сборка модулей через mergeTests
-app/               код под конкретное приложение (клиенты, страницы, фикстуры)
-tests/             сценарии
-demo-app/          встроенное приложение для примеров и CI
-AGENTS.md          правила для AI-агентов
+src/core/          core: environment config, module interface
+src/modules/ui/    BasePage — base for Page Objects
+src/modules/api/   BaseApiClient, api and cleanup fixtures
+src/modules/auth/  role-based login: TokenAuthStrategy, SessionManager
+src/fixtures.ts    module composition via mergeTests
+app/               application-specific code (clients, pages, fixtures)
+tests/             scenarios
+demo-app/          built-in application for examples and CI
+AGENTS.md          guidelines for AI agents
 ```
 
-## Модули
-Подключение и отключение — в `src/fixtures.ts` (`mergeTests(...)`) и `src/modules/registry.ts`.
+## Modules
+Enable or disable modules in `src/fixtures.ts` (`mergeTests(...)`) and `src/modules/registry.ts`.
 
-| Модуль | Статус | Что даёт |
+| Module | Status | What it provides |
 |---|---|---|
-| `ui` | ✅ | `BasePage` для Page Object |
+| `ui` | ✅ | `BasePage` for Page Objects |
 | `api` | ✅ | `BaseApiClient`, `api`, `cleanup` |
-| `auth` | ✅ | вход через API один раз на роль, браузер и API уже авторизованы |
-| `test-data` | 🗓 план | генерация тестовых данных |
-| `reporting` | 🗓 план | Allure |
+| `auth` | ✅ | login via API once per role; browser and API already authenticated |
+| `test-data` | 🗓 planned | test data builders and generation |
+| `reporting` | 🗓 planned | Allure |
 
-## AI-агенты
-`AGENTS.md` описывает архитектуру и правила, чтобы Claude Code, Copilot или агенты Playwright писали тесты через Page Object и API-клиенты проекта.
+## AI agents
+`AGENTS.md` describes the architecture and rules so that Claude Code, Copilot or Playwright agents write tests through the project's Page Objects and API clients.
 
-## Участие
-См. [CONTRIBUTING.md](CONTRIBUTING.md). Лицензия — [MIT](LICENSE).
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md). License — [MIT](LICENSE).

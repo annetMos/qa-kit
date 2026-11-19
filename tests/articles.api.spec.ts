@@ -1,25 +1,25 @@
 import { expect, test } from '../app/fixtures';
 
 /**
- * Пример чистого API-теста на «сырой» фикстуре `api`:
- * полезно для негативных проверок, когда типизированный клиент мешает.
+ * Plain API test example using the raw `api` fixture:
+ * handy for negative checks where a typed client gets in the way.
  */
-test.describe('API: статьи', () => {
-  test('без токена создать статью нельзя', async ({ api }) => {
+test.describe('API: articles', () => {
+  test('cannot create an article without a token', async ({ api }) => {
     const response = await api.post('articles', {
-      data: { article: { title: 'Без авторизации', description: '-', body: '-' } },
+      data: { article: { title: 'Unauthorized', description: '-', body: '-' } },
     });
 
     expect(response.status()).toBe(401);
   });
 
-  test('созданную статью можно получить по slug', async ({ articlesApi, cleanup }) => {
+  test('created article can be fetched by slug', async ({ articlesApi, cleanup }) => {
     const created = await articlesApi.create({
       title: `API ${Date.now()}`,
-      description: 'Проверка чтения',
-      body: 'Текст',
+      description: 'Read check',
+      body: 'Text',
     });
-    cleanup.add(`статья ${created.slug}`, () => articlesApi.remove(created.slug));
+    cleanup.add(`article ${created.slug}`, () => articlesApi.remove(created.slug));
 
     const fetched = await articlesApi.getBySlug(created.slug);
 

@@ -1,8 +1,8 @@
 import 'dotenv/config';
 
 /**
- * Единая точка доступа к настройкам окружения.
- * Значения берутся из `.env` (см. `.env.example`).
+ * Single access point to environment settings.
+ * Values come from `.env` (see `.env.example`).
  */
 export class EnvConfig {
   private static instance: EnvConfig | undefined;
@@ -28,8 +28,8 @@ export class EnvConfig {
     const value = process.env[key];
     if (!value) {
       throw new Error(
-        `[qa-kit] Не задана переменная окружения ${key}. ` +
-          `Скопируйте .env.example в .env и заполните значение.`,
+        `[qa-kit] Environment variable ${key} is not set. ` +
+          `Copy .env.example to .env and fill in the value.`,
       );
     }
     return value;

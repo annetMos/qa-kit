@@ -1,31 +1,32 @@
-# Как поучаствовать
+# Contributing
 
-Спасибо, что хотите помочь! Проект рассчитан в том числе на тех, кто только приходит в автоматизацию, — вопросы и маленькие PR тоже очень ценны.
+Thanks for wanting to help! The project is aimed, among others, at people who are just getting into test automation — questions and small PRs are very welcome too.
 
-## Подготовка
+## Setup
 ```bash
-git clone <ссылка на репозиторий>
+git clone https://github.com/annetMos/qa-kit.git
 cd qa-kit
 npm install
 npx playwright install chromium
-npm run check   # typecheck + тесты против demo-app
+npm run check   # typecheck + tests against the demo-app
 ```
 
-## Процесс
-1. Для крупных изменений сначала создайте issue — обсудим подход.
-2. Ветка от `main`: `feat/<кратко>`, `fix/<кратко>`, `docs/<кратко>`.
-3. Сообщения коммитов в стиле [Conventional Commits](https://www.conventionalcommits.org/ru/): `feat(api): add retry option`.
-4. PR должен проходить CI. Заполните чек-лист в шаблоне PR.
+## Workflow
+1. For larger changes, open an issue first so we can agree on the approach.
+2. Branch from `main`: `feat/<short>`, `fix/<short>`, `docs/<short>`.
+3. Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/): `feat(api): add retry option`.
+4. The PR must pass CI. Fill in the checklist in the PR template.
 
-## Принципы кода
-- TypeScript в strict-режиме, без `any`.
-- ООП: базовые классы задают общее поведение (`BasePage`, `BaseApiClient`), наследники — только своё. Один класс — одна ответственность.
-- Модули не зависят друг от друга; ядро не знает о конкретных модулях.
-- Каждый публичный метод — с JSDoc: что делает и короткий пример. Это и есть подсказки для новичков в IDE.
-- Сообщения об ошибках — понятные человеку: что пошло не так и что сделать.
+## Code principles
+- All code, comments, docs and test names are in English.
+- TypeScript in strict mode, no `any`.
+- OOP: base classes define shared behavior (`BasePage`, `BaseApiClient`), subclasses add only their own. One class — one responsibility.
+- Modules don't depend on each other; the core knows nothing about specific modules.
+- Every public method has JSDoc: what it does and a short example. These are the IDE hints for newcomers.
+- Error messages are human-readable: what went wrong and what to do.
 
-## Как добавить модуль
-1. Папка `src/modules/<name>/` с `index.ts`, который экспортирует `test` (фикстуры) и `<name>Manifest`.
-2. Подключить `test` в `src/fixtures.ts` через `mergeTests`.
-3. Добавить manifest в `src/modules/registry.ts`.
-4. Пример использования в `tests/` и раздел в `README.md`.
+## Adding a module
+1. Create `src/modules/<name>/` with an `index.ts` that exports `test` (fixtures) and `<name>Manifest`.
+2. Plug `test` into `src/fixtures.ts` via `mergeTests`.
+3. Add the manifest to `src/modules/registry.ts`.
+4. Add a usage example in `tests/` and a section in `README.md`.

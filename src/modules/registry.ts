@@ -4,7 +4,7 @@ import { authManifest } from './auth';
 import { uiManifest } from './ui';
 
 /**
- * Список подключённых модулей.
- * Чтобы отключить модуль — уберите его отсюда и из `src/fixtures.ts`.
+ * Enabled modules.
+ * To disable a module, remove it here and in `src/fixtures.ts`.
  */
 export const enabledModules: readonly ModuleManifest[] = [uiManifest, apiManifest, authManifest];

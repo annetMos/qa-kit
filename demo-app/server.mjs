@@ -1,9 +1,9 @@
 /**
- * Мини-приложение в стиле RealWorld (Conduit) для демонстрации и CI.
- * Только то, что нужно примерам: логин, CRUD статей, страница статьи.
- * Данные хранятся в памяти и сбрасываются при перезапуске.
+ * Mini RealWorld (Conduit)-style app for demos and CI.
+ * Only what the examples need: login, article CRUD, article page, editor.
+ * Data is kept in memory and reset on restart.
  *
- * Запуск: npm run demo  →  http://localhost:4555
+ * Run: npm run demo  →  http://localhost:4555
  */
 import { createServer } from 'node:http';
 
@@ -18,7 +18,7 @@ const escapeHtml = (text) =>
   String(text).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 const slugify = (title) =>
-  `${title.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-|-$/g, '')}-${Math.random().toString(36).slice(2, 8)}`;
+  `${title.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')}-${Math.random().toString(36).slice(2, 8)}`;
 
 const sendJson = (res, status, body) => {
   res.writeHead(status, { 'content-type': 'application/json; charset=utf-8' });
@@ -26,8 +26,8 @@ const sendJson = (res, status, body) => {
 };
 
 /**
- * Клиентский скрипт: как во фронтенде Conduit, токен лежит в localStorage (jwtToken).
- * Шапка показывает текущего пользователя, редактор работает только с токеном.
+ * Client script: like the Conduit frontend, the token is kept in localStorage (jwtToken).
+ * The header shows the current user; the editor works only with a token.
  */
 const CLIENT_SCRIPT = `
 const token = localStorage.getItem('jwtToken');
@@ -47,7 +47,7 @@ async function renderNav() {
 function renderEditor() {
   const root = document.getElementById('editor');
   if (!root) return;
-  if (!token) { root.innerHTML = '<p>Чтобы написать статью, <a href="/login">Sign in</a></p>'; return; }
+  if (!token) { root.innerHTML = '<p>To write an article, <a href="/login">Sign in</a></p>'; return; }
   root.innerHTML = '<form>'
     + '<input name="title" placeholder="Article Title">'
     + '<input name="description" placeholder="What\\'s this article about?">'
@@ -69,7 +69,7 @@ renderEditor();
 
 const sendHtml = (res, status, title, content) => {
   res.writeHead(status, { 'content-type': 'text/html; charset=utf-8' });
-  res.end(`<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
+  res.end(`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
 <body><nav><a href="/">conduit</a> <span id="nav-user"></span></nav><main>${content}</main>
 <script>${CLIENT_SCRIPT}</script></body></html>`);
 };
@@ -134,21 +134,21 @@ createServer(async (req, res) => {
     const items = [...articles.values()]
       .map((a) => `<li><a href="/article/${encodeURIComponent(a.slug)}">${escapeHtml(a.title)}</a></li>`)
       .join('');
-    return sendHtml(res, 200, 'Conduit', `<h1>conduit</h1><ul>${items || '<li>Статей пока нет</li>'}</ul>`);
+    return sendHtml(res, 200, 'Conduit', `<h1>conduit</h1><ul>${items || '<li>No articles yet</li>'}</ul>`);
   }
 
   if (req.method === 'GET' && path === '/editor') {
-    return sendHtml(res, 200, 'Editor', '<h1>Новая статья</h1><div id="editor"></div>');
+    return sendHtml(res, 200, 'Editor', '<h1>New article</h1><div id="editor"></div>');
   }
 
   if (req.method === 'GET' && path === '/login') {
-    return sendHtml(res, 200, 'Sign in', '<h1>Sign in</h1><p>В demo-app вход выполняется через API.</p>');
+    return sendHtml(res, 200, 'Sign in', '<h1>Sign in</h1><p>In the demo-app, login is done via the API.</p>');
   }
 
   const uiArticle = path.match(/^\/article\/([^/]+)$/);
   if (req.method === 'GET' && uiArticle) {
     const article = articles.get(uiArticle[1]);
-    if (!article) return sendHtml(res, 404, 'Not found', '<h1>Статья не найдена</h1>');
+    if (!article) return sendHtml(res, 404, 'Not found', '<h1>Article not found</h1>');
     return sendHtml(
       res,
       200,

@@ -3,10 +3,10 @@ import { Credentials, TokenAuthStrategy } from '../../src/modules/auth';
 import { AuthApi } from '../api/auth.api';
 
 /**
- * Вход в RealWorld/Conduit: токен из POST users/login,
- * фронтенд хранит его в localStorage под ключом `jwtToken`,
- * API ждёт заголовок `Authorization: Token <jwt>`.
- * Ключ localStorage у разных реализаций Conduit может отличаться — сверьте со своим фронтендом.
+ * Login for RealWorld/Conduit: the token comes from POST users/login,
+ * the frontend keeps it in localStorage under `jwtToken`,
+ * the API expects the `Authorization: Token <jwt>` header.
+ * The localStorage key may differ between Conduit implementations — check your frontend.
  */
 export class ConduitAuthStrategy extends TokenAuthStrategy {
   protected readonly storageKey = 'jwtToken';

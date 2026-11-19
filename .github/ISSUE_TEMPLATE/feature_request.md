@@ -1,14 +1,14 @@
 ---
-name: Идея или новый модуль
-about: Предложить улучшение или модуль
+name: Feature or module request
+about: Suggest an improvement or a new module
 labels: enhancement
 ---
 
-**Какую проблему решает**
+**What problem does it solve**
 
-**Как это могло бы выглядеть в тесте**
+**How it could look in a test**
 ```ts
-// пример использования
+// usage example
 ```
 
-**Это новый модуль или изменение существующего?**
+**Is this a new module or a change to an existing one?**

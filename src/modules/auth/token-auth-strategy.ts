@@ -2,10 +2,10 @@ import { APIRequestContext } from '@playwright/test';
 import { AuthStrategy, Credentials, Session } from './types';
 
 /**
- * Готовая основа для приложений, которые хранят токен в localStorage
- * и передают его в API в заголовке Authorization.
+ * Ready-made base for applications that keep a token in localStorage
+ * and send it to the API in the Authorization header.
  *
- * Наследнику нужно указать ключ в localStorage и реализовать получение токена.
+ * Subclasses specify the localStorage key and implement token retrieval.
  * @example
  * class MyAppAuth extends TokenAuthStrategy {
  *   protected readonly storageKey = 'accessToken';
@@ -16,16 +16,16 @@ import { AuthStrategy, Credentials, Session } from './types';
  * }
  */
 export abstract class TokenAuthStrategy implements AuthStrategy {
-  /** Ключ, под которым фронтенд хранит токен в localStorage. */
+  /** Key under which the frontend stores the token in localStorage. */
   protected abstract readonly storageKey: string;
 
-  /** @param appUrl адрес фронтенда (BASE_URL) — для него запишется localStorage. */
+  /** @param appUrl frontend URL (BASE_URL) — localStorage is written for this origin. */
   constructor(protected readonly appUrl: string) {}
 
-  /** Получить токен через API. */
+  /** Get a token via the API. */
   protected abstract fetchToken(api: APIRequestContext, credentials: Credentials): Promise<string>;
 
-  /** Значение заголовка Authorization. По умолчанию `Bearer <token>`. */
+  /** Authorization header value. Defaults to `Bearer <token>`. */
   protected authorizationHeader(token: string): string {
     return `Bearer ${token}`;
   }

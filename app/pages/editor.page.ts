@@ -2,7 +2,7 @@ import { Locator, Page } from '@playwright/test';
 import { BasePage } from '../../src/modules/ui';
 import { NewArticle } from '../api/articles.api';
 
-/** Редактор статьи: /editor. Доступен только залогиненному пользователю. */
+/** Article editor: /editor. Available to logged-in users only. */
 export class EditorPage extends BasePage {
   protected readonly path = '/editor';
 
@@ -18,11 +18,11 @@ export class EditorPage extends BasePage {
     this.descriptionInput = page.getByPlaceholder("What's this article about?");
     this.bodyInput = page.getByPlaceholder('Write your article (in markdown)');
     this.publishButton = page.getByRole('button', { name: 'Publish Article' });
-    // Такая же ссылка есть в шапке, поэтому ищем только в основной части страницы
+    // The header has the same link, so search only in the main content
     this.signInPrompt = page.getByRole('main').getByRole('link', { name: 'Sign in' });
   }
 
-  /** Заполнить форму и опубликовать статью. */
+  /** Fill in the form and publish the article. */
   async publish(article: NewArticle): Promise<void> {
     await this.titleInput.fill(article.title);
     await this.descriptionInput.fill(article.description);
